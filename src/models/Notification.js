@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema(
   {
-    type: { type: String, enum: ["missed_attendance"], default: "missed_attendance" },
+    type: { type: String, enum: ["missed_attendance", "payment_overdue"], default: "missed_attendance" },
     member: { type: mongoose.Schema.Types.ObjectId, ref: "Member", required: true },
     memberName: { type: String, required: true },
-    date: { type: String, required: true }, // the day attendance was not marked (YYYY-MM-DD)
+    date: { type: String, required: true }, // missed attendance: the unmarked day; payment_overdue: the promised pay-by date (YYYY-MM-DD)
     message: { type: String, required: true },
     read: { type: Boolean, default: false, index: true },
   },

@@ -3,6 +3,7 @@ import Member from "../models/Member.js";
 import Attendance from "../models/Attendance.js";
 import { requireAdmin } from "../middleware/auth.js";
 import { addDays, todayStr } from "../dates.js";
+import { rideOut } from "../rides.js";
 
 const router = Router();
 router.use(requireAdmin);
@@ -13,7 +14,7 @@ router.get("/day", async (req, res) => {
   const members = await Member.find({ startDate: { $lte: date } }).sort({ name: 1 });
   const active = members.filter((m) => addDays(m.startDate, m.planDays - 1) >= date);
   const marks = await Attendance.find({ date, member: { $in: active.map((m) => m._id) } });
-  const byId = Object.fromEntries(marks.map((a) => [String(a.member), a.status]));
+  const byId = Object.fromEntries(marks.map((a) => [String(a.member), a]));
   res.json({
     date,
     members: active.map((m) => ({
@@ -22,7 +23,8 @@ router.get("/day", async (req, res) => {
       phone: m.phone,
       vehicle: m.vehicle,
       planDays: m.planDays,
-      status: byId[String(m._id)] || null,
+      status: byId[String(m._id)]?.status || null,
+      sessions: (byId[String(m._id)]?.sessions || []).map(rideOut),
     })),
   });
 });

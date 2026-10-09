@@ -4,6 +4,7 @@ import Attendance from "../models/Attendance.js";
 import Notification from "../models/Notification.js";
 import JobRun from "../models/JobRun.js";
 import { addDays, todayStr } from "../dates.js";
+import { checkOverduePayments } from "../payments.js";
 
 const TZ = process.env.TIMEZONE || "Asia/Kathmandu";
 const CHECK_HOUR = 17; // 5 PM
@@ -46,6 +47,7 @@ async function checkMissedAttendance() {
     );
     if (res.upsertedCount) created++;
   }
+  await checkOverduePayments();
   console.log(`[attendance-check] ${date}: ${running.length} running, ${missed.length} unmarked, ${created} new notifications`);
 }
 
